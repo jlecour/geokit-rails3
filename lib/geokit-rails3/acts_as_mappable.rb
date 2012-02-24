@@ -97,12 +97,14 @@ module Geokit
       end
 
       def closest(options = {})
-        geo_scope(options).order("#{distance_column_name} asc").limit(1)
+        limit = options[:limit] || 1
+        geo_scope(options).order("#{distance_column_name} asc").limit(limit)
       end
       alias nearest closest
 
       def farthest(options = {})
-        geo_scope(options).order("#{distance_column_name} desc").limit(1)
+        limit = options[:limit] || 1
+        geo_scope(options).order("#{distance_column_name} desc").limit(limit)
       end
 
       def geo_scope(options = {})
