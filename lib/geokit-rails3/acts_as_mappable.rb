@@ -46,7 +46,7 @@ module Geokit
               self.auto_geocode_error_message = options[:auto_geocode][:error_message] || 'could not locate address'
 
               # set the actual callback here
-              before_validation :auto_geocode_address, :on => :create
+              before_validation :auto_geocode_address, options.reject{|k,v|k == :auto_geocode}.reverse_merge!(:on => :create)
             end
           end
         end
