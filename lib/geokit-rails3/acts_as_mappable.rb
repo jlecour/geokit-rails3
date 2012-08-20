@@ -280,6 +280,8 @@ module Geokit
     # this is the callback for auto_geocoding
     def auto_geocode_address
       address=self.send(auto_geocode_field).to_s
+      # don't try if the address is blank
+      return true if address.blank?
       geo=Geokit::Geocoders::MultiGeocoder.geocode(address)
 
       if geo.success
