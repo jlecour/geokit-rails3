@@ -6,7 +6,9 @@ class Array
   def sort_by_distance_from(origin, opts={})
     distance_attribute_name = opts.delete(:distance_attribute_name) || 'distance'
     self.each do |e|
-      e.class.send(:attr_accessor, distance_attribute_name) if !e.respond_to?("#{distance_attribute_name}=")
+      class << e; self; end.class_eval {
+        attr_accessor distance_attribute_name
+      } if !e.respond_to?("#{distance_attribute_name}=")
       e.send("#{distance_attribute_name}=", e.distance_to(origin,opts))
     end
     self.sort!{|a,b|a.send(distance_attribute_name) <=> b.send(distance_attribute_name)}
