@@ -1,4 +1,6 @@
 require 'pathname'
+# For debugging purposes
+require 'pp'
 
 require 'boot'
 require 'mocha/setup'
