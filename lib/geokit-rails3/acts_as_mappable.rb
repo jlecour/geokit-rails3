@@ -41,9 +41,10 @@ module Geokit
             if options.include?(:auto_geocode) && options[:auto_geocode]
               # if the form auto_geocode=>true is used, let the defaults take over by suppling an empty hash
               options[:auto_geocode] = {} if options[:auto_geocode] == true
-              cattr_accessor :auto_geocode_field, :auto_geocode_error_message
+              cattr_accessor :auto_geocode_field, :auto_geocode_error_message, :swallow_errors
               self.auto_geocode_field = options[:auto_geocode][:field] || 'address'
               self.auto_geocode_error_message = options[:auto_geocode][:error_message] || 'could not locate address'
+              self.swallow_errors = options[:auto_geocode][:swallow_errors] || false
 
               # set the actual callback here
               before_validation :auto_geocode_address, :on => :create
@@ -317,11 +318,15 @@ module Geokit
     # this is the callback for auto_geocoding
     def auto_geocode_address
       address=self.send(auto_geocode_field).to_s
+      # don't try if the address is blank
+      return true if address.blank?
       geo=Geokit::Geocoders::MultiGeocoder.geocode(address)
 
       if geo.success
         self.send("#{lat_column_name}=", geo.lat)
         self.send("#{lng_column_name}=", geo.lng)
+      elsif swallow_errors
+        return true
       else
         errors.add(auto_geocode_field, auto_geocode_error_message)
       end
